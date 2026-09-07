@@ -2,6 +2,13 @@
 dist/
 .turbo/
 
+# examples/*.log are committed test fixtures required by tests/e2e-smoke.test.ts,
+# not runtime log output -- explicit exception to any *.log rule in a
+# contributor's global gitignore (this repo hit exactly that: the fixtures
+# were silently untracked and lost, breaking 8 e2e tests with no git-status
+# signal at all).
+!examples/*.log
+
 # Beads / Dolt files (added by bd init)
 .dolt/
 *.db

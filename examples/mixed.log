@@ -1,0 +1,5 @@
+{"level":"info","message":"starting up"}
+{"level":"error","message":"connection timeout occurred"}
+{"level":"warn","message":"retrying request"}
+plain text line one
+system heartbeat ok
