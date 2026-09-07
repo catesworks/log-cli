@@ -1,5 +1,16 @@
 name: ci
 
+# Runs lint + typecheck + test + build so the agent-ops dispatch pipeline has a
+# real status check to gate auto-merge on -- decideAutoMerge() in agent-ops'
+# scripts/dispatch requires ciState === "success", matching
+# knowledge-base/config.yml's test_command ("bun test && tsc --noEmit").
+#
+# e2e-smoke was excluded 2026-08-29 through 2026-09-07: main had 8 pre-existing
+# failures caused by two committed fixture files (examples/mixed.log,
+# examples/mixed-2.log) being silently untracked -- excluded by a contributor's
+# global `*.log` gitignore rule, with no git-status signal they were ever
+# missing. Fixed via an explicit `!examples/*.log` repo-level gitignore
+# exception; the full suite now runs in `test`.
 on:
   push:
     branches: [main]
@@ -38,10 +49,6 @@ jobs:
       - name: Typecheck
         run: bunx turbo run typecheck $TURBO_FLAGS
 
-      # tests/e2e-smoke.test.ts is excluded by the `test` script itself (8
-      # pre-existing failures unrelated to this workflow, tracked since
-      # 2026-08-29 -- not fixed by this change). Re-enable it in package.json
-      # once those are fixed.
       - name: Test
         run: bunx turbo run test $TURBO_FLAGS
 

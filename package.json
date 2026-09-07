@@ -15,7 +15,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "bun test --path-ignore-patterns=tests/e2e-smoke.test.ts",
+    "test": "bun test",
     "test:e2e": "bun test tests/e2e-smoke.test.ts",
     "changeset": "changeset",
     "version": "changeset version",
