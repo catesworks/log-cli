@@ -1,5 +1,7 @@
 # log
 
+**Topics:** `cli` `tui`
+
 `log` is an interactive TUI for mixed web/server logs:
 
 - JSON lines most of the time
