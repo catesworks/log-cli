@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { openSync } from "node:fs";
 import { ReadStream } from "node:tty";
 import type { Root } from "./ink";

@@ -1,0 +1,65 @@
+name: Release CLI
+
+# Manual only. Builds standalone `log` binaries via `bun build --compile`,
+# cross-compiled for every target from one Linux runner (bun's --target flag
+# supports this without needing a native per-OS machine, so this stays off
+# the org's self-hosted ci-runners group entirely -- also required here
+# since log-cli is a public repo and that group is
+# allows_public_repositories=false). Artifacts only, no GitHub Release cut
+# by this workflow.
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Which platform(s) to build.
+        type: choice
+        default: all
+        options:
+          - all
+          - linux
+          - macos
+          - windows
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set.outputs.matrix }}
+    steps:
+      - id: set
+        run: |
+          full='[
+            {"target":"bun-linux-x64","artifact":"log-cli-linux-x64","platform":"linux"},
+            {"target":"bun-linux-arm64","artifact":"log-cli-linux-arm64","platform":"linux"},
+            {"target":"bun-darwin-x64","artifact":"log-cli-darwin-x64","platform":"macos"},
+            {"target":"bun-darwin-arm64","artifact":"log-cli-darwin-arm64","platform":"macos"},
+            {"target":"bun-windows-x64","artifact":"log-cli-windows-x64.exe","platform":"windows"}
+          ]'
+          platform="${{ github.event.inputs.platform }}"
+          if [ -z "$platform" ] || [ "$platform" = "all" ]; then
+            filtered="$full"
+          else
+            filtered=$(echo "$full" | jq -c --arg p "$platform" '[.[] | select(.platform == $p)]')
+          fi
+          echo "matrix=$(echo "$filtered" | jq -c '{include: .}')" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: plan
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install
+
+      - name: Build binary (${{ matrix.target }})
+        run: bun build ./src/cli.ts --compile --target=${{ matrix.target }} --outfile ${{ matrix.artifact }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}

@@ -10,7 +10,7 @@ import {
 describe("detail actions", () => {
   test("copies path, key, and value from current json row", () => {
     const rows = flattenJsonTree({ a: { b: 3 } }, new Set(["root", "root.a"]));
-    const row = rows[2]!;
+    const row = rows[2];
     expect(copyCurrentPath(row)).toBe("root.a.b");
     expect(copyCurrentKey(row)).toBe("b");
     expect(copyCurrentJsonValue(row)).toBe("3");

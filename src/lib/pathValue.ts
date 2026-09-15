@@ -30,7 +30,7 @@ export function parsePath(input: string): ParsedPath {
   const segments: PathSegment[] = [];
   let index = 0;
   while (index < value.length) {
-    const char = value[index]!;
+    const char = value[index];
     if (char === ".") {
       index += 1;
       continue;
@@ -54,7 +54,7 @@ export function parsePath(input: string): ParsedPath {
     }
 
     let end = index;
-    while (end < value.length && /[A-Za-z0-9_-]/.test(value[end]!)) {
+    while (end < value.length && /[A-Za-z0-9_-]/.test(value[end])) {
       end += 1;
     }
     const key = value.slice(index, end);

@@ -1,0 +1,39 @@
+name: Changesets Version
+
+# Version-only: opens/updates a "Version Packages" PR that bumps
+# package.json + CHANGELOG.md from pending .changeset/*.md files. No publish
+# step -- log-cli is private ("private": true) and ships as a self-hosted
+# binary via release-cli.yml, not a registry package.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: changesets-version-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install
+
+      - name: Create/update Version Packages PR
+        uses: changesets/action@v1
+        with:
+          version: bun run version
+          commit: "chore: version packages"
+          title: "chore: version packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

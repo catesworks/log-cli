@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { Box, Text, useApp, useInput, inkRender } from "./ink-runtime";
 
 export { Box, Text, useApp, useInput };

@@ -18,7 +18,7 @@ export function QueryBar(props: {
     <Box flexDirection="column">
       <Text color="cyan">Query mode</Text>
       <Text dimColor>
-        Examples: level = "error", exists(user.id), level in ("warn","error"), message =~ /health/
+        Examples: level = &quot;error&quot;, exists(user.id), level in (&quot;warn&quot;,&quot;error&quot;), message =~ /health/
       </Text>
       <Box>
         <Text>query&gt; </Text>

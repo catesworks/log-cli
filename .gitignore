@@ -1,5 +1,6 @@
 .omx/
 dist/
+.turbo/
 
 # Beads / Dolt files (added by bd init)
 .dolt/

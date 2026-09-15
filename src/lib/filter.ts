@@ -55,7 +55,7 @@ function tokenize(input: string): Token[] {
   let index = 0;
 
   while (index < input.length) {
-    const char = input[index]!;
+    const char = input[index];
     if (/\s/.test(char)) {
       index += 1;
       continue;
@@ -74,9 +74,9 @@ function tokenize(input: string): Token[] {
       let value = "";
       let cursor = index + 1;
       while (cursor < input.length) {
-        const current = input[cursor]!;
+        const current = input[cursor];
         if (current === "\\" && cursor + 1 < input.length) {
-          value += input[cursor + 1]!;
+          value += input[cursor + 1];
           cursor += 2;
           continue;
         }
@@ -109,7 +109,7 @@ function tokenize(input: string): Token[] {
     if (!match) {
       throw new Error(`unexpected token near: ${input.slice(index)}`);
     }
-    const raw = match[0]!;
+    const raw = match[0];
     if (/^-?\d+(?:\.\d+)?$/.test(raw)) {
       tokens.push({ type: "number", value: Number(raw) });
     } else {

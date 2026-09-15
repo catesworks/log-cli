@@ -95,7 +95,8 @@ export function LogScreen(): React.ReactNode {
   const querySuggestionIndex = useAppState(state => state.querySuggestionIndex);
   const detailSearchDraft = useAppState(state => state.detailSearchDraft);
   const detailSearchTerm = useAppState(state => state.detailSearchTerm);
-  const detailSearchMatches = useAppState(state => state.detailSearchMatches);
+  // Subscribes to trigger re-render on change; the value itself isn't read here.
+  const _detailSearchMatches = useAppState(state => state.detailSearchMatches);
   const startupStatus = useAppState(state => state.startupStatus);
   const statusLine = useAppState(state => state.statusLine);
   const fps = useAppState(state => state.fps);
@@ -315,7 +316,7 @@ export function LogScreen(): React.ReactNode {
     }
 
     if (input in LEVEL_KEY_MAP) {
-      const level = LEVEL_KEY_MAP[input]!;
+      const level = LEVEL_KEY_MAP[input];
       setState(prev => {
         if (prev.mergedView) {
           const next = prev.mergedLevelFilter.includes(level)

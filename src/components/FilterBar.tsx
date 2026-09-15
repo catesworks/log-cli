@@ -11,7 +11,7 @@ export function FilterBar(props: {
     <Box flexDirection="column">
       <Text color="yellow">Filter mode</Text>
       <Text dimColor>
-        Examples: level = "error", request.method = "GET" and not exists(.user.id), span.[].name like "db*"
+        Examples: level = &quot;error&quot;, request.method = &quot;GET&quot; and not exists(.user.id), span.[].name like &quot;db*&quot;
       </Text>
       <Box>
         <Text>filter&gt; </Text>

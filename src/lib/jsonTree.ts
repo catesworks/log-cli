@@ -17,7 +17,7 @@ function walk(
   rows: JsonTreeRow[],
 ): void {
   const expandable =
-    value !== null && typeof value === "object" && Object.keys(value as object).length > 0;
+    value !== null && typeof value === "object" && Object.keys(value).length > 0;
   const isExpanded = expanded.has(path);
   rows.push({
     path,

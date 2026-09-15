@@ -29,7 +29,7 @@ function buildMergedWindow(
       break;
     }
     usedRows += nextRows;
-    window.push(entries[index]!);
+    window.push(entries[index]);
   }
 
   return window;

@@ -34,7 +34,7 @@ export function createDetailSearch(rows: JsonTreeRow[], term: string): {
 
   const prev = (index: number) => {
     for (let i = matches.length - 1; i >= 0; i -= 1) {
-      if (matches[i]! < index) return matches[i]!;
+      if (matches[i] < index) return matches[i];
     }
     return matches.at(-1) ?? index;
   };

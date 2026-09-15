@@ -19,7 +19,7 @@ function normalizeLevel(raw: string | undefined): NormalizedLevel | string {
   if (!raw) return "unknown";
   const value = raw.toLowerCase();
   if (["trace", "debug", "info", "warn", "error", "fatal"].includes(value)) {
-    return value as NormalizedLevel;
+    return value;
   }
   if (value === "warning") return "warn";
   return raw;

@@ -27,7 +27,7 @@ export function moveTrailingOptionsBeforePositionals(args: string[]): string[] {
   const options: string[] = [];
 
   for (let index = 0; index < args.length; index += 1) {
-    const token = args[index]!;
+    const token = args[index];
     const spec = OPTION_INDEX.get(token);
     if (!spec) {
       files.push(token);
@@ -55,7 +55,7 @@ export function parseTopLevelArgs(args: string[]): {
   const options: Record<string, string | boolean | undefined> = {};
 
   for (let index = 0; index < normalized.length; index += 1) {
-    const token = normalized[index]!;
+    const token = normalized[index];
     const spec = OPTION_INDEX.get(token);
     if (!spec) {
       files.push(token);

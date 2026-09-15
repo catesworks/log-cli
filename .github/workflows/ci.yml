@@ -1,25 +1,49 @@
 name: ci
 
-# Runs typecheck so the agent-ops dispatch pipeline has a real status check to gate
-# auto-merge on -- until this exists, decideAutoMerge() in agent-ops' scripts/dispatch
-# always holds PRs for a human, dependency bumps included, since it requires
-# ciState === "success".
-#
-# `bun test` deliberately left OUT of CI for now (2026-08-29): `main` already has 8
-# pre-existing test failures unrelated to this workflow, and knowledge-base/config.yml's
-# test_command ("bun test && tsc --noEmit") would keep this permanently red -- and
-# auto-merge permanently blocked -- until those are fixed as a separate piece of work.
-# Re-add `bun test` here once that's done, and this comment can go.
 on:
   push:
     branches: [main]
   pull_request:
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  typecheck:
+  test:
+    # log-cli is a public repo -- the org's self-hosted ci-runners group has
+    # allows_public_repositories=false, so this stays on a GitHub-hosted
+    # runner (see .catesworks-standards baseline: public-repo-exception).
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # turbo --affected needs full history to diff against main
+
       - uses: oven-sh/setup-bun@v2
+
       - run: bun install
-      - run: bun run typecheck
+
+      - name: Set turbo flags
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "TURBO_FLAGS=--affected" >> "$GITHUB_ENV"
+          else
+            echo "TURBO_FLAGS=" >> "$GITHUB_ENV"
+          fi
+
+      - name: Lint
+        run: bunx turbo run lint $TURBO_FLAGS
+
+      - name: Typecheck
+        run: bunx turbo run typecheck $TURBO_FLAGS
+
+      # tests/e2e-smoke.test.ts is excluded by the `test` script itself (8
+      # pre-existing failures unrelated to this workflow, tracked since
+      # 2026-08-29 -- not fixed by this change). Re-enable it in package.json
+      # once those are fixed.
+      - name: Test
+        run: bunx turbo run test $TURBO_FLAGS
+
+      - name: Build
+        run: bunx turbo run build $TURBO_FLAGS

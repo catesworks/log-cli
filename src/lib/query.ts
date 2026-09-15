@@ -21,7 +21,7 @@ function tokenize(input: string): Token[] {
   const tokens: Token[] = [];
   let i = 0;
   while (i < input.length) {
-    const char = input[i]!;
+    const char = input[i];
     if (/\s/.test(char)) {
       i += 1;
       continue;
@@ -72,7 +72,7 @@ function tokenize(input: string): Token[] {
     if (!match) {
       throw new Error(`Unexpected query token near: ${input.slice(i)}`);
     }
-    const value = match[0]!;
+    const value = match[0];
     const lowered = value.toLowerCase();
     if (["and", "or", "not", "like", "in", "exists"].includes(lowered)) {
       tokens.push({ type: "operator", value: lowered });

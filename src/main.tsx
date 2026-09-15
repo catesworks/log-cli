@@ -46,6 +46,7 @@ async function runSummary(options: CliOptions, fileArgs: string[]): Promise<void
     const completedSources = new Set<string>();
     let settled = false;
     let idleTimer: ReturnType<typeof setTimeout> | undefined;
+    // eslint-disable-next-line prefer-const -- declared here, assigned later once `finish` is defined (closure capture)
     let maxTimer: ReturnType<typeof setTimeout> | undefined;
 
     const finish = () => {
