@@ -31,4 +31,4 @@ Text lines have no level, so their normalized level is `unknown`.
 
 ## README references (10)
 
-These README lines use the fixtures: 34, 41, 47, 55, 73, 79, 139 (piped stdin), 166, 172, and the link at 341. Each direct or piped invocation exits 0 with `mixed.log`'s 5-entry summary. The network and docker examples do not use the fixtures.
+These README lines use the fixtures: 34, 41, 47, 55, 73, 79, 139 (piped stdin), 166, 172, and the link at 341. Verified on 2026-11-14 with no TTY attached (each command falls back to summary mode). Every invocation exits 0 and reports `mixed.log`'s 5 entries. Line 41 is the exception: its `--filter 'level = "error"'` keeps 1 entry. The network and docker examples do not use the fixtures.
