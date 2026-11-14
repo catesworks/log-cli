@@ -3,12 +3,13 @@ import { createRoot } from "./ink";
 import { getRenderContext, renderAndRun, exitWithMessage } from "./interactiveHelpers";
 import { launchRepl } from "./replLauncher";
 import { parseTopLevelArgs } from "./lib/argv";
-import { loadConfig } from "./lib/config";
+import { ConfigError, loadConfig } from "./lib/config";
 import { resolveSources, validateSources } from "./lib/sources";
 import { getDefaultAppState } from "./state/AppStateStore";
 import { startSourceManager } from "./lib/sourceManager";
 import { buildFilteredSummary, buildSummary } from "./lib/summary";
-import type { LogEntry } from "./types";
+import type { AppConfig, LogEntry } from "./types";
+import packageJson from "../package.json" with { type: "json" };
 
 type CliOptions = {
   config?: string;
@@ -25,8 +26,19 @@ type CliOptions = {
   summaryText?: boolean;
 };
 
+async function loadConfigOrExit(explicitPath?: string): Promise<AppConfig> {
+  try {
+    return await loadConfig(process.cwd(), explicitPath);
+  } catch (error) {
+    if (error instanceof ConfigError) {
+      throw await exitWithMessage(error.message);
+    }
+    throw error;
+  }
+}
+
 async function runSummary(options: CliOptions, fileArgs: string[]): Promise<void> {
-  const config = await loadConfig(process.cwd(), options.config);
+  const config = await loadConfigOrExit(options.config);
   const follow = options.noFollow === false ? false : true;
   const sources = resolveSources({ files: fileArgs, url: options.url, cmd: options.cmd });
   const error = validateSources(sources);
@@ -136,11 +148,18 @@ export async function main(): Promise<void> {
     .option("--no-follow", "Start with follow mode disabled")
     .option("--summary-json", "Read input and output a JSON summary instead of starting the TUI")
     .option("--summary-text", "Read input and output a text summary instead of starting the TUI")
-    .helpOption("-h, --help", "Display help");
+    .helpOption("-h, --help", "Display help")
+    .version(packageJson.version, "-V, --version", "Print the version");
 
   const rawArgs = process.argv.slice(2);
   const normalizedInput = rawArgs[0] === "--" ? rawArgs.slice(1) : rawArgs;
-  if (normalizedInput.includes("--help") || normalizedInput.includes("-h")) {
+  // Must run before the non-TTY summary gate below, or a piped call waits on stdin.
+  if (
+    normalizedInput.includes("--help") ||
+    normalizedInput.includes("-h") ||
+    normalizedInput.includes("--version") ||
+    normalizedInput.includes("-V")
+  ) {
     await program.parseAsync(process.argv);
     return;
   }
@@ -155,7 +174,7 @@ export async function main(): Promise<void> {
     return;
   }
 
-  const config = await loadConfig(process.cwd(), options.config);
+  const config = await loadConfigOrExit(options.config);
   const sources = resolveSources({ files: fileArgs, url: options.url, cmd: options.cmd });
   const error = validateSources(sources);
   if (error) {

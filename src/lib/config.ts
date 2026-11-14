@@ -44,28 +44,53 @@ function stripJsonComments(text: string): string {
     .replace(/\/\*[\s\S]*?\*\//g, "");
 }
 
-async function readConfigFile(filePath: string): Promise<AppConfig | null> {
+export class ConfigError extends Error {
+  override name = "ConfigError";
+}
+
+// Explicit --config problems throw ConfigError; auto-discovered files that are
+// malformed warn and yield defaults; missing auto-discovered files are silent.
+async function readConfigFile(
+  filePath: string,
+  explicit: boolean,
+  warn: (message: string) => void,
+): Promise<AppConfig | null> {
+  let message: string;
   try {
-    const text = await fs.readFile(filePath, "utf8");
-    const parsed = JSON.parse(stripJsonComments(text));
-    return configSchema.parse(parsed);
-  } catch {
-    return null;
+    return configSchema.parse(JSON.parse(stripJsonComments(await fs.readFile(filePath, "utf8"))));
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      if (!explicit) return null;
+      message = `Config file not found: ${filePath}`;
+    } else if (error instanceof z.ZodError) {
+      message = `Invalid config ${filePath}: ${z.prettifyError(error)}`;
+    } else if (error instanceof SyntaxError) {
+      message = `Invalid JSON in config ${filePath}: ${error.message}`;
+    } else {
+      message = `Cannot read config ${filePath}: ${(error as Error).message}`;
+    }
   }
+  if (explicit) throw new ConfigError(message);
+  warn(`${message}; using defaults`);
+  return DEFAULT_CONFIG;
 }
 
 export async function loadConfig(
   cwd: string,
   explicitPath?: string,
+  warn: (message: string) => void = message => process.stderr.write(`${message}\n`),
 ): Promise<AppConfig> {
+  if (explicitPath) {
+    return (await readConfigFile(explicitPath, true, warn)) ?? DEFAULT_CONFIG;
+  }
+
   const candidates = [
-    explicitPath,
     path.join(cwd, ".log.jsonc"),
     path.join(process.env.HOME ?? "", ".config", "log", "config.jsonc"),
-  ].filter(Boolean) as string[];
+  ];
 
   for (const candidate of candidates) {
-    const loaded = await readConfigFile(candidate);
+    const loaded = await readConfigFile(candidate, false, warn);
     if (loaded) {
       return loaded;
     }

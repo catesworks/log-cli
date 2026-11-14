@@ -18,6 +18,8 @@ const OPTION_SPECS: OptionSpec[] = [
   { name: "--summary-text", takesValue: false },
   { name: "--help", takesValue: false },
   { name: "-h", takesValue: false },
+  { name: "--version", takesValue: false },
+  { name: "-V", takesValue: false },
 ];
 
 const OPTION_INDEX = new Map(OPTION_SPECS.map(spec => [spec.name, spec] as const));
