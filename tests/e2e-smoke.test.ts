@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { spawn, spawnSync } from "node:child_process";
-import { chmodSync, unlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import http from "node:http";
 import { join } from "node:path";
 
@@ -54,6 +54,12 @@ async function runAsync(cmd: string, args: string[]): Promise<string> {
 }
 
 describe("log e2e smoke", () => {
+  test("prints the version, even with piped stdin", () => {
+    const { version } = JSON.parse(readFileSync(join(root, "package.json"), "utf8")) as { version: string };
+    expect(run(["run", "src/cli.ts", "--version"], "piped\n").trim()).toBe(version);
+    expect(run(["run", "src/cli.ts", "-V"]).trim()).toBe(version);
+  });
+
   test("shows top-level help", () => {
     const output = run(["run", "src/cli.ts", "--help"]);
     expect(output).toContain("log");
