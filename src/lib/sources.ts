@@ -18,7 +18,7 @@ export function resolveSources(input: {
     });
   }
 
-  if (input.url) {
+  if (input.url !== undefined) {
     specs.push({
       id: createId("src"),
       label: input.url,
@@ -27,7 +27,7 @@ export function resolveSources(input: {
     });
   }
 
-  if (input.cmd) {
+  if (input.cmd !== undefined) {
     specs.push({
       id: createId("src"),
       label: input.cmd,
@@ -64,6 +64,20 @@ export function validateSources(sources: SourceSpec[]): string | null {
         return `Path is a directory, not a file: ${source.filePath}`;
       }
       // Regular files and named pipes (FIFOs) are both accepted
+    }
+    if (source.kind === "url" && source.url !== undefined) {
+      let parsed: URL;
+      try {
+        parsed = new URL(source.url);
+      } catch {
+        return `Invalid URL: ${source.url}`;
+      }
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+        return `Unsupported URL scheme (expected http or https): ${source.url}`;
+      }
+    }
+    if (source.kind === "cmd" && !source.command?.trim()) {
+      return "Command must not be empty (--cmd)";
     }
   }
 
