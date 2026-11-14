@@ -13,6 +13,9 @@ export function FilterBar(props: {
       <Text dimColor>
         Examples: level = &quot;error&quot;, request.method = &quot;GET&quot; and not exists(.user.id), span.[].name like &quot;db*&quot;
       </Text>
+      <Text dimColor>
+        Filter syntax differs from query (Q): like = anchored glob, regex = ~~=, substring = ~=
+      </Text>
       <Box>
         <Text>filter&gt; </Text>
         <TextInput value={props.value} onChange={props.onChange} onSubmit={props.onSubmit} />
