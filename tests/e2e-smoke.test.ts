@@ -198,7 +198,9 @@ describe("log e2e smoke", () => {
     expect(output).toContain("\"entries\": 1");
     expect(output).toContain("\"json\": 0");
     expect(output).toContain("\"text\": 1");
-    expect(elapsedMs).toBeLessThan(1500);
+    // Guards against falling back to runSummary's 5000ms maxSummaryWaitMs; 3000ms
+    // keeps that signal while leaving headroom for slow CI runners (log-cli-ssw.3).
+    expect(elapsedMs).toBeLessThan(3000);
   });
 
   test("summarizes a streaming URL", async () => {
@@ -278,7 +280,9 @@ describe("log e2e smoke", () => {
     expect(output).toContain("\"entries\": 0");
     expect(output).toContain("\"json\": 0");
     expect(output).toContain("\"text\": 0");
-    expect(elapsedMs).toBeLessThan(1500);
+    // Guards against falling back to runSummary's 5000ms maxSummaryWaitMs; 3000ms
+    // keeps that signal while leaving headroom for slow CI runners (log-cli-ssw.3).
+    expect(elapsedMs).toBeLessThan(3000);
   });
 
   test("handles a high-volume synthetic command stream", () => {
