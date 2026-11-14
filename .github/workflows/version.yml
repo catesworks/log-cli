@@ -26,6 +26,8 @@ jobs:
           fetch-depth: 0
 
       - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2 # keep in sync with package.json packageManager
 
       - run: bun install
 
