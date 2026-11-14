@@ -47,6 +47,12 @@ For day-to-day use, the wrapper binary is the least surprising:
 ./bin/log examples/mixed.log --merge
 ```
 
+Print the version:
+
+```bash
+./bin/log --version   # or -V
+```
+
 ## Quick how-tos
 
 Open a local file:
@@ -158,6 +164,17 @@ Installed binary:
 ./bin/log --url https://example.com/logs
 ```
 
+Source validation runs at startup, before any input is read:
+
+- a file that does not exist: `File not found: <path>`
+- a directory: `Path is a directory, not a file: <path>` (directories are not
+  expanded into their files)
+- `--url` must be an `http://` or `https://` URL: `Invalid URL: <value>` or
+  `Unsupported URL scheme (expected http or https): <value>`
+- `--cmd` must not be empty: `Command must not be empty (--cmd)`
+
+Each prints the message to stderr and exits with code 1.
+
 ## Headless summary modes
 
 JSON summary:
@@ -219,6 +236,8 @@ Notes:
 - Filters apply to structured JSON fields when a row is JSON.
 - Text rows still support virtual fields like `message`, `level`, `prefix`, and `raw`.
 - Legacy shorthand like `level:error` and bare substring filters still work.
+- Filter and query syntax are not interchangeable; see
+  [Filter vs query operators](#filter-vs-query-operators).
 
 Examples:
 
@@ -249,6 +268,19 @@ exists(user.id) and level in ("warn","error")
 not message =~ /health/
 ```
 
+### Filter vs query operators
+
+The two languages share some operator names with different meanings:
+
+| Meaning | Filter (`F`) | Query (`Q`) |
+| --- | --- | --- |
+| substring | `message ~= "timeout"` | `message like "timeout"` |
+| wildcard | `service like "api*"` (anchored glob: whole value must match) | not supported |
+| regex | `message ~~= "timeout\|retry"` | `message =~ /timeout\|retry/` |
+
+So `service like "api"` matches only the exact value `api` in a filter, but any
+value containing `api` in a query.
+
 ## Config
 
 `log` looks for config in this order:
@@ -256,6 +288,15 @@ not message =~ /health/
 1. `--config /path/to/file.jsonc`
 2. `./.log.jsonc`
 3. `$HOME/.config/log/config.jsonc`
+
+Error handling:
+
+- `--config <path>` that is missing, is not valid JSON, or fails validation
+  prints `Config file not found: <path>`, `Invalid JSON in config <path>: ...`
+  or `Invalid config <path>: ...` to stderr and exits with code 1.
+- A malformed auto-discovered file (2 or 3) prints a warning to stderr and
+  runs with the default config.
+- No config file anywhere is silent and uses defaults.
 
 Example config:
 

@@ -20,6 +20,9 @@ export function QueryBar(props: {
       <Text dimColor>
         Examples: level = &quot;error&quot;, exists(user.id), level in (&quot;warn&quot;,&quot;error&quot;), message =~ /health/
       </Text>
+      <Text dimColor>
+        Query syntax differs from filter (F): like = substring, regex = =~
+      </Text>
       <Box>
         <Text>query&gt; </Text>
         <TextInput value={props.value} onChange={props.onChange} onSubmit={props.onSubmit} />
