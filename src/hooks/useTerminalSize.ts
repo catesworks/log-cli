@@ -1,10 +1,17 @@
 import { useEffect, useState } from "react";
 
+export function readTerminalSize(stdout: { columns?: number; rows?: number }): {
+  columns: number;
+  rows: number;
+} {
+  return {
+    columns: stdout.columns ?? 100,
+    rows: stdout.rows ?? 30,
+  };
+}
+
 export function useTerminalSize(): { columns: number; rows: number } {
-  const read = () => ({
-    columns: process.stdout.columns ?? 100,
-    rows: process.stdout.rows ?? 30,
-  });
+  const read = () => readTerminalSize(process.stdout);
   const [size, setSize] = useState(read);
   useEffect(() => {
     const onResize = () => setSize(read());
