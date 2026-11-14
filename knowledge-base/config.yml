@@ -3,7 +3,7 @@
 
 # What counts as "tested" for completeness-eval. Run from the repo root after
 # the agent's own changes.
-test_command: "bun test && tsc --noEmit"
+test_command: "bun run build && bun test && tsc --noEmit"
 
 # Gates tov-eval + publish-safety-eval. This repo has no publish step (private
 # npm package, no site) -- a public GitHub repo alone doesn't count as

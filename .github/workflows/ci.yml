@@ -3,7 +3,7 @@ name: ci
 # Runs lint + typecheck + test + build so the agent-ops dispatch pipeline has a
 # real status check to gate auto-merge on -- decideAutoMerge() in agent-ops'
 # scripts/dispatch requires ciState === "success", matching
-# knowledge-base/config.yml's test_command ("bun test && tsc --noEmit").
+# knowledge-base/config.yml's test_command ("bun run build && bun test && tsc --noEmit").
 #
 # e2e-smoke was excluded 2026-08-29 through 2026-09-07: main had 8 pre-existing
 # failures caused by two committed fixture files (examples/mixed.log,
@@ -32,6 +32,8 @@ jobs:
           fetch-depth: 0 # turbo --affected needs full history to diff against main
 
       - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2 # keep in sync with package.json packageManager
 
       - run: bun install
 
